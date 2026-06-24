@@ -41,10 +41,11 @@ class _ProjectsViewState extends State<_ProjectsView> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+    return BackButtonListener(
+      onBackButtonPressed: () async {
+        final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
+        if (!isCurrent) return false; // Let parent routes handle the back press (pop)
+
         final now = DateTime.now();
         final backButtonHasNotBeenPressedOrExpired = _lastPressedAt == null ||
             now.difference(_lastPressedAt!) > const Duration(seconds: 2);
@@ -56,14 +57,13 @@ class _ProjectsViewState extends State<_ProjectsView> {
               SnackBar(
                 content: Text('press_again_to_exit'.tr()),
                 duration: const Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: isDark ? AppColors.cardDark : AppColors.textLight,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
             );
           }
+          return true; // Handled, prevent propagation
         } else {
           SystemNavigator.pop();
+          return true; // Handled, prevent propagation
         }
       },
       child: Scaffold(
@@ -77,7 +77,7 @@ class _ProjectsViewState extends State<_ProjectsView> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: IconButton(
                 icon: const Icon(Icons.person_outlined, size: 26),
-                onPressed: () => context.go('/profile'),
+                onPressed: () => context.push('/profile'),
               ),
             ),
           ],
@@ -111,8 +111,8 @@ class _ProjectsViewState extends State<_ProjectsView> {
                         direction: DismissDirection.endToStart,
                         background: Container(
                           margin: const EdgeInsets.only(bottom: 16),
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20.0),
+                          alignment: AlignmentDirectional.centerEnd,
+                          padding: const EdgeInsetsDirectional.only(end: 20.0),
                           decoration: BoxDecoration(
                             color: AppColors.error,
                             borderRadius: BorderRadius.circular(16),
@@ -131,8 +131,6 @@ class _ProjectsViewState extends State<_ProjectsView> {
                               SnackBar(
                                 content: Text('delete_success'.tr()),
                                 duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
                             );
                           }

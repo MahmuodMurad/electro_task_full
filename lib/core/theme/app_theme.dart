@@ -49,6 +49,16 @@ class AppTheme {
         side: const BorderSide(color: AppColors.borderLight),
       ),
     ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: const Color(0xFF1E293B), // Slate-800 for high-contrast on light bg
+      contentTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ),
   );
 
   static ThemeData get darkTheme => ThemeData(
@@ -97,6 +107,16 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.borderDark),
       ),
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.primaryDark, // Neon Indigo for high-contrast on dark bg
+      contentTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   );
 }

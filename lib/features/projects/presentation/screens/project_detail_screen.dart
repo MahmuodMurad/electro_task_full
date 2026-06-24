@@ -89,8 +89,8 @@ class _ProjectDetailView extends StatelessWidget {
                       direction: DismissDirection.endToStart,
                       background: Container(
                         margin: const EdgeInsets.only(bottom: 14),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20.0),
+                        alignment: AlignmentDirectional.centerEnd,
+                        padding: const EdgeInsetsDirectional.only(end: 20.0),
                         decoration: BoxDecoration(
                           color: AppColors.error,
                           borderRadius: BorderRadius.circular(16),
@@ -109,8 +109,6 @@ class _ProjectDetailView extends StatelessWidget {
                             SnackBar(
                               content: Text('delete_success'.tr()),
                               duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                           );
                         }
