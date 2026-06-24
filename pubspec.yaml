@@ -1,0 +1,48 @@
+name: task_manager_electro
+description: "Task Manager App - Flutter with BLoC/Cubit, dark/light theme, AR/EN localization"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_bloc: ^8.1.5
+
+  # HTTP Client
+  dio: ^5.4.3
+
+  # Secure Token Storage
+  flutter_secure_storage: ^9.0.0
+
+  # Navigation
+  go_router: ^13.2.5
+
+  # Localization
+  easy_localization: ^3.0.7
+
+  # Theme Persistence
+  shared_preferences: ^2.2.3
+
+  # UI Helpers
+  flutter_spinkit: ^5.2.1
+
+  # Icons
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/translations/
