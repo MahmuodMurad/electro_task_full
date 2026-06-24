@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> checkAuth() async {
-    emit(AuthLoading());
+    emit(AuthChecking());
     try {
       final user = await repository.getMe();
       if (user != null) {
@@ -35,7 +35,14 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await repository.login(email, password);
       emit(AuthAuthenticated(user));
     } on DioException catch (e) {
-      final msg = e.response?.data['message'] ?? 'error_generic';
+      final serverMsg = e.response?.data['message']?.toString() ?? '';
+      String msg = 'error_generic';
+      if (serverMsg.toLowerCase().contains('invalid') ||
+          serverMsg.toLowerCase().contains('credential') ||
+          serverMsg.toLowerCase().contains('wrong') ||
+          serverMsg.toLowerCase().contains('password')) {
+        msg = 'error_invalid_credentials';
+      }
       emit(AuthError(msg));
     }
   }
@@ -46,7 +53,14 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await repository.register(name, email, password);
       emit(AuthAuthenticated(user));
     } on DioException catch (e) {
-      final msg = e.response?.data['message'] ?? 'error_generic';
+      final serverMsg = e.response?.data['message']?.toString() ?? '';
+      String msg = 'error_generic';
+      if (serverMsg.toLowerCase().contains('exist') ||
+          serverMsg.toLowerCase().contains('already') ||
+          serverMsg.toLowerCase().contains('conflict') ||
+          serverMsg.toLowerCase().contains('duplicate')) {
+        msg = 'error_user_exists';
+      }
       emit(AuthError(msg));
     }
   }

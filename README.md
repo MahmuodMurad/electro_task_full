@@ -6,7 +6,7 @@ Electro is a high-fidelity, premium **Full-Stack Task Management Application** d
 
 ## 📱 APK Download Link
 
-🚀 **[Download the Electro Mobile App (APK)](https://drive.google.com/file/d/1F5k64494LKv1kL_KdBM4j7-_oBIVxXTg/view?usp=sharing)**
+🚀 **[Download the Electro Mobile App (APK)](https://drive.google.com/file/d/1Ge4Jh0YXCB0F3JNy8Cdtkp8bBwXESo0u/view?usp=sharing)**
 
 ---
 

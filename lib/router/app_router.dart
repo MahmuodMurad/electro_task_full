@@ -21,7 +21,7 @@ class AppRouter {
         final isOnSplash = loc == '/splash';
         final isOnAuth = loc == '/login' || loc == '/register';
 
-        if (authState is AuthInitial || authState is AuthLoading) {
+        if (authState is AuthInitial || authState is AuthChecking) {
           if (!isOnSplash) return '/splash';
           return null;
         }
@@ -31,7 +31,7 @@ class AppRouter {
           return null;
         }
 
-        if (authState is AuthUnauthenticated) {
+        if (authState is AuthUnauthenticated || authState is AuthError) {
           if (!isOnAuth) return '/login';
           return null;
         }

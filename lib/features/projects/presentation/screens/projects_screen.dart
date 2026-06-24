@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:task_manager_electro/core/network/dio_client.dart';
 import 'package:task_manager_electro/core/theme/app_colors.dart';
@@ -86,7 +87,12 @@ class _ProjectsViewState extends State<_ProjectsView> {
         body: BlocBuilder<ProjectCubit, ProjectState>(
           builder: (context, state) {
             if (state is ProjectLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(
+                child: SpinKitDoubleBounce(
+                  color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                  size: 50,
+                ),
+              );
             }
             if (state is ProjectError) {
               return AppErrorWidget(
