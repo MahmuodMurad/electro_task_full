@@ -24,5 +24,9 @@ class ProjectRepository {
     final res = await dio.get(ApiConstants.project(id));
     return ProjectModel.fromJson(res.data);
   }
+
+  Future<void> deleteProject(String id) async {
+    await dio.delete(ApiConstants.project(id));
+  }
 }
 

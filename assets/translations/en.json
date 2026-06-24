@@ -43,5 +43,7 @@
   "priority": "Priority",
   "active": "Active",
   "completed": "Completed",
-  "archived": "Archived"
+  "archived": "Archived",
+  "press_again_to_exit": "Press back again to exit",
+  "delete_success": "Deleted successfully"
 }

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager_electro/core/theme/app_colors.dart';
 
 class StatusChip extends StatelessWidget {
   final String status;
@@ -65,26 +66,26 @@ class StatusChip extends StatelessWidget {
     if (isPriority) {
       switch (status) {
         case 'low':
-          return Colors.blue;
+          return AppColors.priorityLow;
         case 'medium':
-          return Colors.orange;
+          return AppColors.priorityMedium;
         case 'high':
-          return Colors.red;
+          return AppColors.priorityHigh;
         default:
           return Colors.grey;
       }
     }
     switch (status) {
       case 'pending':
-        return Colors.orange;
+        return AppColors.statusPending;
       case 'in_progress':
-        return Colors.blue;
+        return AppColors.statusInProgress;
       case 'done':
-        return Colors.green;
+        return AppColors.statusDone;
       case 'active':
-        return Colors.green;
+        return AppColors.statusDone;
       case 'completed':
-        return Colors.blue;
+        return AppColors.statusInProgress;
       case 'archived':
         return Colors.grey;
       default:
@@ -92,3 +93,4 @@ class StatusChip extends StatelessWidget {
     }
   }
 }
+

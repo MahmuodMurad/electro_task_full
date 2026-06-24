@@ -43,5 +43,7 @@
   "priority": "الأولوية",
   "active": "نشط",
   "completed": "مكتمل",
-  "archived": "مؤرشف"
+  "archived": "مؤرشف",
+  "press_again_to_exit": "اضغط مجدداً للخروج",
+  "delete_success": "تم الحذف بنجاح"
 }

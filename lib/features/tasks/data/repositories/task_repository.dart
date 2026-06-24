@@ -25,5 +25,9 @@ class TaskRepository {
     final res = await dio.patch(ApiConstants.task(taskId), data: data);
     return TaskModel.fromJson(res.data);
   }
+
+  Future<void> deleteTask(String id) async {
+    await dio.delete(ApiConstants.task(id));
+  }
 }
 

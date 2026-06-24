@@ -30,6 +30,26 @@ class TaskModel {
     updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
   );
 
+  TaskModel copyWith({
+    String? id,
+    String? title,
+    String? status,
+    String? priority,
+    String? project,
+    String? owner,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => TaskModel(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    status: status ?? this.status,
+    priority: priority ?? this.priority,
+    project: project ?? this.project,
+    owner: owner ?? this.owner,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+
   Map<String, dynamic> toJson() => {
     'title': title,
     'status': status,

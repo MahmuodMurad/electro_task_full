@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/network/dio_client.dart';
+import 'package:task_manager_electro/core/network/dio_client.dart';
+import 'package:task_manager_electro/core/theme/app_colors.dart';
+import 'package:task_manager_electro/widgets/fade_in_slide.dart';
 import '../../../tasks/data/repositories/task_repository.dart';
 import '../../../tasks/presentation/cubit/task_cubit.dart';
 import '../../../tasks/presentation/cubit/task_state.dart';
@@ -34,9 +36,14 @@ class _ProjectDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('tasks'.tr()),
+        title: Text(
+          'tasks'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: BlocBuilder<TaskCubit, TaskState>(
         builder: (context, state) {
@@ -56,40 +63,109 @@ class _ProjectDetailView extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: () => context.read<TaskCubit>().loadTasks(),
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 itemCount: state.tasks.length,
                 itemBuilder: (context, index) {
                   final task = state.tasks[index];
                   final isDone = task.status == 'done';
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      leading: IconButton(
-                        icon: Icon(
-                          isDone ? Icons.check_circle : Icons.circle_outlined,
-                          color: isDone ? Colors.green : null,
+                  
+                  // Get priority accent color
+                  Color priorityColor;
+                  switch (task.priority) {
+                    case 'high':
+                      priorityColor = AppColors.priorityHigh;
+                      break;
+                    case 'medium':
+                      priorityColor = AppColors.priorityMedium;
+                      break;
+                    default:
+                      priorityColor = AppColors.priorityLow;
+                  }
+
+                  return FadeInSlide(
+                    duration: Duration(milliseconds: 400 + (index * 50).clamp(0, 300)),
+                    child: Dismissible(
+                      key: Key(task.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.white,
                           size: 28,
                         ),
-                        onPressed: isDone
-                            ? null
-                            : () => context.read<TaskCubit>().markDone(task.id),
                       ),
-                      title: Text(
-                        task.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          decoration: isDone ? TextDecoration.lineThrough : null,
+                      onDismissed: (direction) async {
+                        final taskCubit = context.read<TaskCubit>();
+                        final success = await taskCubit.deleteTask(task.id);
+                        if (success && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('delete_success'.tr()),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                          );
+                        }
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                          ),
                         ),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Row(
-                          children: [
-                            StatusChip(status: task.status),
-                            const SizedBox(width: 8),
-                            StatusChip(status: task.priority, isPriority: true),
-                          ],
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            // Side accent border
+                            decoration: BoxDecoration(
+                              border: Border(
+                                left: BorderSide(
+                                  color: priorityColor,
+                                  width: 5.0,
+                                ),
+                              ),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              leading: AnimatedCheckbox(
+                                isChecked: isDone,
+                                onTap: () => context.read<TaskCubit>().toggleTaskStatus(task.id),
+                              ),
+                              title: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 200),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDone
+                                      ? (isDark ? AppColors.textMutedDark : AppColors.textMutedLight)
+                                      : (isDark ? AppColors.textDark : AppColors.textLight),
+                                  decoration: isDone ? TextDecoration.lineThrough : TextDecoration.none,
+                                ),
+                                child: Text(task.title),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Row(
+                                  children: [
+                                    StatusChip(status: task.status),
+                                    const SizedBox(width: 8),
+                                    StatusChip(status: task.priority, isPriority: true),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -107,7 +183,7 @@ class _ProjectDetailView extends StatelessWidget {
             context: context,
             isScrollControlled: true,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             builder: (_) => BlocProvider.value(
               value: context.read<TaskCubit>(),
@@ -115,8 +191,93 @@ class _ProjectDetailView extends StatelessWidget {
             ),
           );
         },
-        icon: const Icon(Icons.add),
-        label: Text('add_task'.tr()),
+        icon: const Icon(Icons.add_rounded),
+        label: Text(
+          'add_task'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+        foregroundColor: Colors.white,
+        elevation: 4,
+      ),
+    );
+  }
+}
+
+class AnimatedCheckbox extends StatefulWidget {
+  final bool isChecked;
+  final VoidCallback onTap;
+
+  const AnimatedCheckbox({
+    super.key,
+    required this.isChecked,
+    required this.onTap,
+  });
+
+  @override
+  State<AnimatedCheckbox> createState() => _AnimatedCheckboxState();
+}
+
+class _AnimatedCheckboxState extends State<AnimatedCheckbox> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant AnimatedCheckbox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isChecked != oldWidget.isChecked) {
+      _controller.forward().then((_) => _controller.reverse());
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: widget.isChecked ? AppColors.statusDone : Colors.transparent,
+            border: Border.all(
+              color: widget.isChecked
+                  ? AppColors.statusDone
+                  : (isDark ? AppColors.borderDark : AppColors.borderLight),
+              width: 2.0,
+            ),
+          ),
+          child: widget.isChecked
+              ? const Icon(
+                  Icons.check_rounded,
+                  size: 18,
+                  color: Colors.white,
+                )
+              : null,
+        ),
       ),
     );
   }
