@@ -105,6 +105,10 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   child: BlocBuilder<ThemeCubit, ThemeState>(
                     builder: (context, themeState) {
+                      final isThemeDark = themeState.themeMode == ThemeMode.system
+                          ? Theme.of(context).brightness == Brightness.dark
+                          : themeState.themeMode == ThemeMode.dark;
+
                       return SwitchListTile(
                         secondary: const Icon(Icons.dark_mode_outlined),
                         title: Text(
@@ -112,8 +116,8 @@ class ProfileScreen extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         activeThumbColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                        value: themeState.themeMode == ThemeMode.dark,
-                        onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                        value: isThemeDark,
+                        onChanged: (_) => context.read<ThemeCubit>().toggleTheme(context),
                       );
                     },
                   ),

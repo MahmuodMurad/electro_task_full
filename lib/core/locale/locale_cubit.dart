@@ -11,7 +11,14 @@ class LocaleCubit extends Cubit<LocaleState> {
 
   Future<void> loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(StorageConstants.locale) ?? 'en';
+    final savedLocale = prefs.getString(StorageConstants.locale);
+    String code;
+    if (savedLocale != null) {
+      code = savedLocale;
+    } else {
+      final sysCode = PlatformDispatcher.instance.locale.languageCode;
+      code = (sysCode == 'ar' || sysCode == 'en') ? sysCode : 'en';
+    }
     emit(LocaleState(Locale(code)));
   }
 
