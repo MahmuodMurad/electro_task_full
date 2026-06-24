@@ -1,12 +1,19 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_manager_electro/core/network/dio_client.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository repository;
+  StreamSubscription<void>? _unauthorizedSubscription;
 
-  AuthCubit(this.repository) : super(AuthInitial());
+  AuthCubit(this.repository) : super(AuthInitial()) {
+    _unauthorizedSubscription = DioClient.onUnauthorized.stream.listen((_) {
+      logout();
+    });
+  }
 
   Future<void> checkAuth() async {
     emit(AuthLoading());
@@ -47,5 +54,11 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     await repository.logout();
     emit(AuthUnauthenticated());
+  }
+
+  @override
+  Future<void> close() {
+    _unauthorizedSubscription?.cancel();
+    return super.close();
   }
 }

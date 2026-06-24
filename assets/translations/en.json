@@ -45,5 +45,7 @@
   "completed": "Completed",
   "archived": "Archived",
   "press_again_to_exit": "Press back again to exit",
-  "delete_success": "Deleted successfully"
+  "delete_success": "Deleted successfully",
+  "add_project_subtitle": "Organize your workflow by creating a new project container",
+  "add_task_subtitle": "Define a specific action item to complete in this project"
 }

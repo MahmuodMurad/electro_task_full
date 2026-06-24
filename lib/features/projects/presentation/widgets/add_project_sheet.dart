@@ -2,24 +2,25 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_manager_electro/core/theme/app_colors.dart';
-import '../cubit/task_cubit.dart';
+import '../cubit/project_cubit.dart';
 
-class AddTaskSheet extends StatefulWidget {
-  const AddTaskSheet({super.key});
+class AddProjectSheet extends StatefulWidget {
+  const AddProjectSheet({super.key});
 
   @override
-  State<AddTaskSheet> createState() => _AddTaskSheetState();
+  State<AddProjectSheet> createState() => _AddProjectSheetState();
 }
 
-class _AddTaskSheetState extends State<AddTaskSheet> {
+class _AddProjectSheetState extends State<AddProjectSheet> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  String _priority = 'medium';
+  final _descriptionController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -75,7 +76,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                     ],
                   ),
                   child: const Icon(
-                    Icons.task_alt_rounded,
+                    Icons.work_outline_rounded,
                     color: Colors.white,
                     size: 24,
                   ),
@@ -86,7 +87,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'add_task'.tr(),
+                        'create_project'.tr(),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -95,7 +96,7 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'add_task_subtitle'.tr(),
+                        'add_project_subtitle'.tr(),
                         style: TextStyle(
                           fontSize: 13,
                           color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
@@ -108,12 +109,12 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
             ),
             const SizedBox(height: 28),
 
-            // Task Title Input
+            // Title Input
             TextFormField(
               controller: _titleController,
               enabled: !_isLoading,
               decoration: InputDecoration(
-                labelText: 'task_title'.tr(),
+                labelText: 'project_title'.tr(),
                 prefixIcon: const Icon(Icons.title_rounded),
               ),
               validator: (value) {
@@ -121,24 +122,20 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                 return null;
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // Priority Selector Section
-            Text(
-              'priority'.tr(),
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            // Description Input
+            TextFormField(
+              controller: _descriptionController,
+              enabled: !_isLoading,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'project_description'.tr(),
+                prefixIcon: const Icon(Icons.description_outlined),
+                alignLabelWithHint: true,
+              ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _buildPriorityChip('low', 'priority_low'.tr(), AppColors.priorityLow, isDark)),
-                const SizedBox(width: 10),
-                Expanded(child: _buildPriorityChip('medium', 'priority_medium'.tr(), AppColors.priorityMedium, isDark)),
-                const SizedBox(width: 10),
-                Expanded(child: _buildPriorityChip('high', 'priority_high'.tr(), AppColors.priorityHigh, isDark)),
-              ],
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
 
             // Actions Row
             Row(
@@ -179,12 +176,12 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                         : () async {
                             if (_formKey.currentState!.validate()) {
                               setState(() => _isLoading = true);
-                              final taskCubit = context.read<TaskCubit>();
+                              final projectCubit = context.read<ProjectCubit>();
                               final navigator = Navigator.of(context);
                               final messenger = ScaffoldMessenger.of(context);
-                              final success = await taskCubit.createTask(
+                              final success = await projectCubit.createProject(
                                 _titleController.text.trim(),
-                                _priority,
+                                _descriptionController.text.trim(),
                               );
                               if (success) {
                                 if (navigator.context.mounted) {
@@ -219,69 +216,6 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriorityChip(String value, String label, Color color, bool isDark) {
-    final isSelected = _priority == value;
-
-    return GestureDetector(
-      onTap: _isLoading
-          ? null
-          : () {
-              setState(() => _priority = value);
-            },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: isDark ? 0.15 : 0.1)
-              : (isDark ? AppColors.cardDark : Colors.white),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected
-                ? color
-                : (isDark ? AppColors.borderDark : AppColors.borderLight),
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : [],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Status dot
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected
-                    ? (isDark ? Colors.white : color)
-                    : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
-                fontSize: 13,
-              ),
             ),
           ],
         ),

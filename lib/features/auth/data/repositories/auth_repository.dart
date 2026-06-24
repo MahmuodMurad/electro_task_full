@@ -12,13 +12,13 @@ class AuthRepository {
 
   Future<UserModel> login(String email, String password) async {
     final res = await dio.post(ApiConstants.login, data: {'email': email, 'password': password});
-    await storage.write(key: StorageConstants.jwtToken, value: res.data['token']);
+    await storage.write(key: StorageConstants.jwtToken, value: res.data['accessToken']);
     return UserModel.fromJson(res.data['user']);
   }
 
   Future<UserModel> register(String name, String email, String password) async {
     final res = await dio.post(ApiConstants.register, data: {'name': name, 'email': email, 'password': password});
-    await storage.write(key: StorageConstants.jwtToken, value: res.data['token']);
+    await storage.write(key: StorageConstants.jwtToken, value: res.data['accessToken']);
     return UserModel.fromJson(res.data['user']);
   }
 

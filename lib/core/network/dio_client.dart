@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:task_manager_electro/core/constants/storage_constants.dart';
 import '../constants/api_constants.dart';
 
 class DioClient {
+  static final onUnauthorized = StreamController<void>.broadcast();
+
   static Dio createDio() {
     final dio = Dio(
       BaseOptions(
@@ -37,6 +40,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    if (err.response?.statusCode == 401) {
+      DioClient.onUnauthorized.add(null);
+    }
     handler.next(err);
   }
 }

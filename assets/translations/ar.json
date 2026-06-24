@@ -45,5 +45,7 @@
   "completed": "مكتمل",
   "archived": "مؤرشف",
   "press_again_to_exit": "اضغط مجدداً للخروج",
-  "delete_success": "تم الحذف بنجاح"
+  "delete_success": "تم الحذف بنجاح",
+  "add_project_subtitle": "نظّم سير عملك بإنشاء حاوية مشروع جديدة",
+  "add_task_subtitle": "حدّد إجراءً معيّناً لإنجازه في هذا المشروع"
 }

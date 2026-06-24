@@ -12,6 +12,7 @@ import 'package:task_manager_electro/widgets/status_chip.dart';
 import '../../data/repositories/project_repository.dart';
 import '../cubit/project_cubit.dart';
 import '../cubit/project_state.dart';
+import '../widgets/add_project_sheet.dart';
 
 class ProjectsScreen extends StatelessWidget {
   const ProjectsScreen({super.key});
@@ -207,7 +208,7 @@ class _ProjectsViewState extends State<_ProjectsView> {
           },
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => _showCreateProjectDialog(context),
+          onPressed: () => _showCreateProjectSheet(context),
           icon: const Icon(Icons.add_rounded),
           label: Text(
             'add_project'.tr(),
@@ -221,92 +222,17 @@ class _ProjectsViewState extends State<_ProjectsView> {
     );
   }
 
-  void _showCreateProjectDialog(BuildContext parentContext) {
-    final titleController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-    final isDark = Theme.of(parentContext).brightness == Brightness.dark;
-
-    showDialog(
+  void _showCreateProjectSheet(BuildContext parentContext) {
+    showModalBottomSheet(
       context: parentContext,
-      builder: (dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text(
-            'create_project'.tr(),
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    labelText: 'project_title'.tr(),
-                    prefixIcon: const Icon(Icons.work_outline_rounded),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) return 'field_required'.tr();
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(
-                    labelText: 'project_description'.tr(),
-                    prefixIcon: const Icon(Icons.description_outlined),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(
-                'cancel'.tr(),
-                style: TextStyle(
-                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                minimumSize: const Size(100, 45),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final projectCubit = parentContext.read<ProjectCubit>();
-                  final messenger = ScaffoldMessenger.of(parentContext);
-                  final success = await projectCubit.createProject(
-                    titleController.text.trim(),
-                    descriptionController.text.trim(),
-                  );
-                  if (success && dialogContext.mounted) {
-                    Navigator.pop(dialogContext);
-                  } else {
-                    messenger.showSnackBar(
-                      SnackBar(
-                        content: Text('error_generic'.tr()),
-                        backgroundColor: AppColors.error,
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Text('save'.tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        );
-      },
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => BlocProvider.value(
+        value: parentContext.read<ProjectCubit>(),
+        child: const AddProjectSheet(),
+      ),
     );
   }
 }
